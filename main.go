@@ -30,3 +30,29 @@ func Worker(target string, dictionary chan string, results chan string) {
 		}
 	}
 }
+
+//Scan pour énuméré la liste 
+func Scan(target string, dictionaryPath string, workers int, quiet bool) {
+	// Ouvrir le fichier du dictionnaire (Merci Stackover)
+	file, err := os.Open(dictionaryPath)
+	if err != nil {
+		fmt.Println("Erreur lors de l'ouverture du fichier du dictionnaire:", err)
+		return
+	}
+	defer file.Close()
+
+	// Créer des chan pour les dict, resultat et la fin
+	dictionary := make(chan string, 100)
+	results := make(chan string, 100)
+	done := make(chan bool)
+
+	var wg sync.WaitGroup
+
+	//Start les workers
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			Worker(target, dictionary, results)
+		}()
+	}
