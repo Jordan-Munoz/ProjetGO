@@ -105,7 +105,7 @@ func main() {
 
     // Vérifier si les flags obligatoires sont définis
     if *dictionaryPath == "" || *target == "" {
-        fmt.Println("Utilisation de mygb:")
+        fmt.Println("Utilisation de GoBousester:")
         flag.PrintDefaults()
         return
     }
@@ -114,7 +114,7 @@ func main() {
     start = time.Now()
 
     // Afficher les détails de la configuration
-    fmt.Println("Démarrage de MyGB")
+    fmt.Println("Démarrage de GoBousester")
     fmt.Println("---")
     fmt.Println("Cible:", *target)
     fmt.Println("Liste:", *dictionaryPath)
