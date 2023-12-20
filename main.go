@@ -11,6 +11,7 @@ import (
 )
 
 //By Jordan Munoz for ProjectGO 
+//Check my Git for more "https://github.com/Jordan-Munoz"
 //Worker = les travailleurs :D
 func Worker(target string, dictionary chan string, results chan string) {
 	for word := range dictionary {
@@ -20,7 +21,7 @@ func Worker(target string, dictionary chan string, results chan string) {
 		// Tester la connexion
 		response, err := http.Get(url)
 		
-		// Verif si la connexion passe ou pas (200 OK - 404 Pas OK)
+		// Verif si la connexion passe ou pas (200 OK - 404 Pas OK ETC)
 		if err == nil {
 			// Envoie du résultat
 			results <- fmt.Sprintf("%s %d", url, response.StatusCode)
