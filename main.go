@@ -56,3 +56,71 @@ func Scan(target string, dictionaryPath string, workers int, quiet bool) {
 			Worker(target, dictionary, results)
 		}()
 	}
+
+	//Lire le dict et donner aux workers
+	go func() {
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			dictionary <- scanner.Text()
+		}
+		close(dictionary)
+	}()
+
+	// Afficher les résultats pendant le scan
+	go func() {
+		for result := range results {
+			if !quiet {
+				fmt.Println(result)
+			}
+		}
+		done <- true // Fin du scan
+	}()
+
+	fmt.Println("Starting scan...")
+
+	// Attendre la fin du scan des workers
+	wg.Wait()
+
+	// Fermer le canal des résultats
+	close(results)
+
+	// Attendre la fin du traitement des résultats (Merci mec de stack)
+	<-done
+
+	// Afficher le temps écoulé
+	fmt.Println("Scan terminé en", time.Since(start))
+}
+
+var start time.Time
+
+func main() {
+    // Définir les flag 
+    dictionaryPath := flag.String("d", "", "Chemin vers le fichier du dictionnaire")
+    quiet := flag.Bool("q", false, "Mode silencieux, affiche uniquement le HTTP 200")
+    target := flag.String("t", "", "Cible à énumérer")
+    workers := flag.Int("w", 1, "Nombre de travailleurs à exécuter")
+
+    // Analyser les flags
+    flag.Parse()
+
+    // Vérifier si les flags obligatoires sont définis
+    if *dictionaryPath == "" || *target == "" {
+        fmt.Println("Utilisation de mygb:")
+        flag.PrintDefaults()
+        return
+    }
+
+    // Initialiser la variable start
+    start = time.Now()
+
+    // Afficher les détails de la configuration
+    fmt.Println("Démarrage de MyGB")
+    fmt.Println("---")
+    fmt.Println("Cible:", *target)
+    fmt.Println("Liste:", *dictionaryPath)
+    fmt.Println("Travailleurs:", *workers)
+    fmt.Println("---")
+
+    // Démarrer le scan
+    Scan(*target, *dictionaryPath, *workers, *quiet)
+}
